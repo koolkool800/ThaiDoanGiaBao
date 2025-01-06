@@ -133,7 +133,3 @@ http://localhost:3000/api-docs
 | Name | Default Value | Description |
 | ---- | ------------- | ----------- |
 | PORT | 3000          | API Port    |
-
-```
-
-```
