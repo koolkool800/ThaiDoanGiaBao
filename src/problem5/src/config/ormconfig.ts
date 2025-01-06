@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { DataSource } from 'typeorm';
 
-module.exports.dataSource = new DataSource({
+export const dataSource = new DataSource({
     type: 'mysql',
     host: 'localhost',
     port: 3306,
@@ -12,3 +12,5 @@ module.exports.dataSource = new DataSource({
     entities: [join(__dirname, '../modules/**/entities/*.entity{.ts,.js}')],
     migrations: [join(__dirname, '../migrations/*{.ts,.js}')],
 });
+
+export default dataSource;

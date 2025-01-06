@@ -6,6 +6,7 @@ import { GetBookDto } from '../dtos/get.dto';
 import { ErrorException } from '../../../config/error-exception';
 import { BOOK_ERROR_CODE } from '../book.constant';
 import { UpdateBookDto } from '../dtos/update-book.dto';
+import { RECORD_ORDER } from '../../../common/interfaces/sort';
 
 export class BookService {
     private bookRepository: Repository<Book>;
@@ -29,9 +30,14 @@ export class BookService {
             qb.andWhere('(book.title ILIKE :q OR book.author ILIKE :q)', { q: `%${filters.q}%` });
         }
 
+        if (filters.sort) {
+            qb.orderBy(`book.${filters.sort}`, filters.order || RECORD_ORDER.DESC);
+        }
+
         qb.offset(filters.getOffset()).limit(filters.pageSize);
 
-        return await qb.getManyAndCount();
+        const [books, total] = await qb.getManyAndCount();
+        return { books, total };
     }
 
     async findOne(id: number): Promise<Book> {
