@@ -1,0 +1,5 @@
+enum BOOK_ERROR_CODE {
+    NOT_FOUND = 'BOOK_NOT_FOUND|404',
+}
+
+export { BOOK_ERROR_CODE };
