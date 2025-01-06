@@ -2,24 +2,25 @@ import express, { Application } from 'express';
 import { AppModule } from './app/app.module';
 import dotenv from 'dotenv';
 import { loggerMiddleware } from './common/middlewares/logger.middleware';
-import { AppDataSource } from './config/typeorm.config';
+import { DatabaseService } from './config/database.service';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerOptions } from './config/swagger.config';
 dotenv.config();
 
 const bootstrap = async () => {
     const app = express();
 
     // Initialize TypeORM
-    try {
-        await AppDataSource.initialize();
-        console.log('Database connection established');
-    } catch (error) {
-        console.error('Error connecting to database:', error);
-        process.exit(1);
-    }
+    await DatabaseService.initialize();
 
     // Middleware setup
     app.use(express.json());
     app.use(loggerMiddleware);
+
+    // Setup Swagger
+    const specs = swaggerJsdoc(swaggerOptions);
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
     // Load modules
     const appModule = new AppModule(app);
