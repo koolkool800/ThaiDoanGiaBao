@@ -1,4 +1,4 @@
-import { Application, Request, Response, Router } from 'express';
+import { Application, NextFunction, Request, Response, Router } from 'express';
 import { BookController } from './controllers/book.controller';
 import { validationMiddleware } from '../../common/middlewares/validation.middleware';
 import { GetBookDto } from './dtos/get-books.dto';
@@ -16,24 +16,36 @@ export class BookModule {
     }
 
     private initRoutes() {
-        this.router.get('/', validationMiddleware(GetBookDto), (req: Request, res: Response) => {
-            this.bookController.getBooks(req, res);
-        });
-        this.router.post('/', validationMiddleware(CreateBookDto), (req: Request, res: Response) => {
-            this.bookController.createBook(req, res);
-        });
-        this.router.put('/:id', validationMiddleware(UpdateBookDto), (req: Request, res: Response) => {
-            this.bookController.updateBook(req, res);
-        });
-        this.router.delete('/:id', (req: Request, res: Response) => {
-            this.bookController.deleteBook(req, res);
-        });
-        this.router.get('/:id', (req: Request, res: Response) => {
-            this.bookController.getBook(req, res);
-        });
+        this.router.get(
+            '/',
+            validationMiddleware(GetBookDto),
+            this.asyncHandler(this.bookController.getBooks.bind(this.bookController)),
+        );
+        this.router.post(
+            '/',
+            validationMiddleware(CreateBookDto),
+            this.asyncHandler(this.bookController.createBook.bind(this.bookController)),
+        );
+        this.router.put(
+            '/:id',
+            validationMiddleware(UpdateBookDto),
+            this.asyncHandler(this.bookController.updateBook.bind(this.bookController)),
+        );
+        this.router.delete('/:id', this.asyncHandler(this.bookController.deleteBook.bind(this.bookController)));
+        this.router.get('/:id', this.asyncHandler(this.bookController.getBook.bind(this.bookController)));
     }
 
     init() {
         this.app.use('/api/books', this.router);
+    }
+
+    private asyncHandler(fn: Function) {
+        return async (req: Request, res: Response, next: NextFunction) => {
+            try {
+                await fn(req, res);
+            } catch (error) {
+                next(error);
+            }
+        };
     }
 }

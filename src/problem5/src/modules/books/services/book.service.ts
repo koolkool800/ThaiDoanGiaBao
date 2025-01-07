@@ -27,7 +27,7 @@ export class BookService {
             .select(['book.id', 'book.title', 'book.author', 'book.description', 'book.price']);
 
         if (filters.q) {
-            qb.andWhere('(book.title ILIKE :q OR book.author ILIKE :q)', { q: `%${filters.q}%` });
+            qb.andWhere('(book.title LIKE :q OR book.author LIKE :q)', { q: `%${filters.q}%` });
         }
 
         if (filters.sort) {

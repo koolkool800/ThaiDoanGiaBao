@@ -6,6 +6,7 @@ import { DatabaseService } from './config/database.service';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerOptions } from './config/swagger.config';
+import { errorHandlerMiddleware } from './common/middlewares/error-handler.middleware';
 dotenv.config();
 
 const bootstrap = async () => {
@@ -21,6 +22,8 @@ const bootstrap = async () => {
     // Setup Swagger
     const specs = swaggerJsdoc(swaggerOptions);
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+    app.use(errorHandlerMiddleware);
 
     // Load modules
     const appModule = new AppModule(app);
